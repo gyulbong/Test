@@ -6,13 +6,18 @@ on:
 jobs:
   slack:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Get last commit message
+        id: get_commit
+        run: echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
+
       - name: Send message to Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
             {
-              "text": "🚀 코드가 push 되었습니다!\n📦 Repository: ${{ github.repository }}\n🔀 Branch: ${{ github.ref }}\n👤 By: ${{ github.actor }}"
+              "text": "🚀 코드가 push 되었습니다!\n📝 커밋 메시지: \"${{ steps.get_commit.outputs.message }}\"\n📦 Repository: ${{ github.repository }}\n🔀 Branch: ${{ github.ref }}\n👤 By: ${{ github.actor }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
