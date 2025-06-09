@@ -1,23 +1,25 @@
-name: Notify Slack on Push
+name: Notify Slack with commit message
 
-on:
-  push:
+on: push
 
 jobs:
   slack:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get last commit message
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get commit message
         id: get_commit
         run: echo "message=$(git log -1 --pretty=%B)" >> $GITHUB_OUTPUT
 
-      - name: Send message to Slack
+      - name: Send to Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
           payload: |
             {
-              "text": "🚀 코드가 push 되었습니다!\n📝 커밋 메시지: \"${{ steps.get_commit.outputs.message }}\"\n📦 Repository: ${{ github.repository }}\n🔀 Branch: ${{ github.ref }}\n👤 By: ${{ github.actor }}"
+              "text": "🚀 Push 발생!\n📝 커밋 메시지: \"${{ steps.get_commit.outputs.message }}\""
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
